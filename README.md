@@ -2,6 +2,8 @@
 
 Small plugin for showing the selected values first as an _optgroup_ when opening a [bootstrap-multiselect](http://davidstutz.github.io/bootstrap-multiselect/) dropdown. Please be aware that the selected values list only updates when the dropdown is opened.
 
+![Example of multiselect showing the selected values.](example.png?raw=true "Example of multiselect showing the selected values.")
+
 In order to use it, simply load the JavaScript and CSS files after _bootstrap-multiselect_. Then you can specify the following new options when initializing the _bootstrap-multiselect_ component:
 
 * _showSelectedValues_: whether we want to show the currently selected values upon opening the dropdown. Setting it to _false_ completely disables this plugin. Default: _false_
