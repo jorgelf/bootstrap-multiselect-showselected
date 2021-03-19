@@ -24,6 +24,9 @@
  .multiselect-container .multiselect-group.multiselect-selected-values {
   cursor: pointer;
  }
+ .multiselect-container .multiselect-group.multiselect-selected-values .caret-container {
+  pointer-events: none;
+ }
  .multiselect-container .multiselect-group.multiselect-selected-values.collapsed .caret-container::after {
   transform: rotate(-90deg);
   -ms-transform: rotate(-90deg);

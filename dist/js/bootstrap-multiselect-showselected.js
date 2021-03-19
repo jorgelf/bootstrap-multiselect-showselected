@@ -158,7 +158,7 @@ $.fn.multiselect.Constructor.prototype.mergeOptions = function (options) {
 			this.$popupContainer.find('.multiselect-selected-values-entry').remove();
 			this.$popupContainer.find('.multiselect-selected-values-hidden').removeClass('multiselect-selected-values-hidden');
 			var values = this.$select.val();
-			if (values) {
+			if (values && values.length) {
 				for (var i = values.length - 1; i >= 0; i--) {
 					var option = this.getInputByValue(values[i]).closest('.multiselect-option');
 					var newOption = option.clone().removeClass('multiselect-option').addClass('multiselect-group-option-indented').addClass('multiselect-selected-values-entry').addClass('multiselect-selected-values-option');
