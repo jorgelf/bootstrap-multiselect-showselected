@@ -175,7 +175,6 @@ $.fn.multiselect.Constructor.prototype.mergeOptions = function (options) {
 					title.show();
 					title.nextAll('.dropdown-divider:first').show();
 				}
-				this.$popupContainer.find('.multiselect-group.multiselect-selected-values').toggleClass('collapsed', this.options.showSelectedValuesCollapsed);
 			} else {
 				if (this.options.showSelectedValuesEmpty) {
 					var text = $('<span class="multiselect-selected-values-entry multiselect-group-option-indented multiselect-selected-values-none dropdown-item-text">' + this.options.selectedValuesNoValuesText + '</span>');
@@ -189,6 +188,7 @@ $.fn.multiselect.Constructor.prototype.mergeOptions = function (options) {
 					title.nextAll('.dropdown-divider:first').hide();
 				}
 			}
+			this.$popupContainer.find('.multiselect-group.multiselect-selected-values').toggleClass('collapsed', this.options.showSelectedValuesCollapsed);
 		}
 		if (this.options.onDropdownShowOriginal) {
 			this.options.onDropdownShowOriginal(event);
