@@ -34,27 +34,37 @@ $.fn.multiselect.Constructor.prototype.buildDropdown = function() {
 
 	this.buildDropdownOriginal();
 
+	this.oldDropdownVersion = !('$popupContainer' in this);
+
 	if (this.options.showSelectedValues) {
 		var label = this.options.selectedValuesTitleText;
 		var value = 'bootstrap-multiselect-selected-values';
 		var title = this.options.selectedValuesTitleText;
 
-		var $groupOption = $("<span class='multiselect-group multiselect-selected-values dropdown-item-text'></span>");
+		var $groupOption = $(this.oldDropdownVersion ? '<li class="multiselect-item multiselect-group multiselect-selected-values"><a href="javascript:void(0);"><label><b></b></label></a></li>' : "<span class='multiselect-group multiselect-selected-values dropdown-item-text'></span>");
 
 		if (this.options.enableHTML) {
-			$groupOption.html(" " + label);
+			(this.oldDropdownVersion ? $groupOption.find('label b') : $groupOption).html(" " + label);
 		} else {
-			$groupOption.text(" " + label);
+			(this.oldDropdownVersion ? $groupOption.find('label b') : $groupOption).text(" " + label);
 		}
 
+		this.$dropdownContainer = (this.oldDropdownVersion ? this.$ul : this.$popupContainer);
+
 		$groupOption.find('.form-check').addClass('d-inline-block');
-		$groupOption.append('<span class="caret-container dropdown-toggle pl-1"></span>');
+		if (this.oldDropdownVersion) {
+			$('a', $groupOption).append('<span class="caret-container"><b class="caret"></b></span>');
+		} else {
+			$groupOption.append('<span class="caret-container dropdown-toggle pl-1"></span>');
+		}
+		this.$dropdownContainer.append($groupOption);
 
-		this.$popupContainer.append($groupOption);
-
-		$(".multiselect-selected-values", this.$popupContainer).off("click");
-		$(".multiselect-selected-values", this.$popupContainer).on("click", $.proxy(function (event) {
+		$(".multiselect-selected-values", this.$dropdownContainer).off("click");
+		$(".multiselect-selected-values", this.$dropdownContainer).on("click", $.proxy(function (event) {
 			var $group = $(event.target);
+			if (this.oldDropdownVersion) {
+				$group = $group.closest('li');
+			}
 			var $inputs = $group.nextUntil(":not(.multiselect-selected-values-entry)");
 
 			var visible = true;
@@ -81,7 +91,7 @@ $.fn.multiselect.Constructor.prototype.refreshOriginal = $.fn.multiselect.Constr
 $.fn.multiselect.Constructor.prototype.refresh = function() {
 	if (this.options.showSelectedValues) {
 		var inputs = {};
-		$('.multiselect-selected-values-option input', this.$popupContainer).each(function () {
+		$('.multiselect-selected-values-option input', this.$dropdownContainer).each(function () {
 			inputs[$(this).val()] = $(this);
 		});
 		$('option', this.$select).each($.proxy(function (index, element) {
@@ -93,14 +103,14 @@ $.fn.multiselect.Constructor.prototype.refresh = function() {
 					$input.prop('checked', true);
 
 					if (this.options.selectedClass) {
-						$input.closest('.multiselect-selected-values-option')
+						$input.closest(this.oldDropdownVersion ? 'li' : '.multiselect-selected-values-option')
 							.addClass(this.options.selectedClass);
 					}
 				} else {
 					$input.prop('checked', false);
 
 					if (this.options.selectedClass) {
-						$input.closest('.multiselect-selected-values-option')
+						$input.closest(this.oldDropdownVersion ? 'li' : '.multiselect-selected-values-option')
 							.removeClass(this.options.selectedClass);
 					}
 				}
@@ -155,14 +165,14 @@ $.fn.multiselect.Constructor.prototype.mergeOptions = function (options) {
 	options.onDropdownShowOriginal = options.onDropdownShow;
 	options.onDropdownShow = function(event) {
 		if (this.options.showSelectedValues) {
-			this.$popupContainer.find('.multiselect-selected-values-entry').remove();
-			this.$popupContainer.find('.multiselect-selected-values-hidden').removeClass('multiselect-selected-values-hidden');
+			this.$dropdownContainer.find('.multiselect-selected-values-entry').remove();
+			this.$dropdownContainer.find('.multiselect-selected-values-hidden').removeClass('multiselect-selected-values-hidden');
 			var values = this.$select.val();
 			if (values && values.length) {
 				for (var i = values.length - 1; i >= 0; i--) {
-					var option = this.getInputByValue(values[i]).closest('.multiselect-option');
+					var option = this.getInputByValue(values[i]).closest(this.oldDropdownVersion ? 'li' : '.multiselect-option');
 					var newOption = option.clone().removeClass('multiselect-option').addClass('multiselect-group-option-indented').addClass('multiselect-selected-values-entry').addClass('multiselect-selected-values-option');
-					newOption.insertAfter(this.$popupContainer.find('.multiselect-selected-values'));
+					newOption.insertAfter(this.$dropdownContainer.find('.multiselect-selected-values'));
 					if (this.options.showSelectedValuesCollapsed) {
 						newOption.addClass('multiselect-collapsible-hidden').hide();
 					}
@@ -171,24 +181,24 @@ $.fn.multiselect.Constructor.prototype.mergeOptions = function (options) {
 					}
 				}
 				if (!this.options.showSelectedValuesEmpty) {
-					var title = this.$popupContainer.find('.multiselect-group.multiselect-selected-values');
+					var title = this.$dropdownContainer.find('.multiselect-group.multiselect-selected-values');
 					title.show();
-					title.nextAll('.dropdown-divider:first').show();
+					title.nextAll(this.oldDropdownVersion ? '.multiselect-item.divider:first' : '.dropdown-divider:first').show();
 				}
 			} else {
 				if (this.options.showSelectedValuesEmpty) {
-					var text = $('<span class="multiselect-selected-values-entry multiselect-group-option-indented multiselect-selected-values-none dropdown-item-text">' + this.options.selectedValuesNoValuesText + '</span>');
-					text.insertAfter(this.$popupContainer.find('.multiselect-selected-values'));
+					var text = $('<span class="multiselect-selected-values-entry multiselect-selected-values-none dropdown-item-text">' + this.options.selectedValuesNoValuesText + '</span>');
+					text.insertAfter(this.$dropdownContainer.find('.multiselect-selected-values'));
 					if (this.options.showSelectedValuesCollapsed) {
 						text.addClass('multiselect-collapsible-hidden').hide();
 					}
 				} else {
-					var title = this.$popupContainer.find('.multiselect-group.multiselect-selected-values');
+					var title = this.$dropdownContainer.find('.multiselect-group.multiselect-selected-values');
 					title.hide();
-					title.nextAll('.dropdown-divider:first').hide();
+					title.nextAll(this.oldDropdownVersion ? '.multiselect-item.divider:first' : '.dropdown-divider:first').hide();
 				}
 			}
-			this.$popupContainer.find('.multiselect-group.multiselect-selected-values').toggleClass('collapsed', this.options.showSelectedValuesCollapsed);
+			this.$dropdownContainer.find('.multiselect-group.multiselect-selected-values').toggleClass('collapsed', this.options.showSelectedValuesCollapsed);
 		}
 		if (this.options.onDropdownShowOriginal) {
 			this.options.onDropdownShowOriginal(event);
